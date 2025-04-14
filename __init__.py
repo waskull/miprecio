@@ -5,6 +5,7 @@ from .middleware import register_middleware
 from .auth.routes import auth_router
 from .user.routes import user_router
 from .product.routes import product_router
+from .category.routes import category_router
 from .db import engine
 
 version = "v1"
@@ -47,3 +48,4 @@ register_middleware(app)
 app.include_router(auth_router, prefix=f"{version_prefix}/auth", tags=["auth"])
 app.include_router(user_router, prefix=f"{version_prefix}/user", tags=["user"])
 app.include_router(product_router, prefix=f"{version_prefix}/product", tags=["product"])
+app.include_router(category_router, prefix=f"{version_prefix}/category", tags=["category"])

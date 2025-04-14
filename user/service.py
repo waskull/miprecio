@@ -49,3 +49,25 @@ class UserService:
 
         await session.commit()
         return user
+
+    async def edit_user(self, user:User , user_data: dict, session: AsyncSession) -> User:
+        user.name = user_data.name
+        user.price = user_data.price
+        user.description =user_data.description
+        session.add(user)
+        await session.commit()
+        return user
+    
+    async def edit_user_password(self, user:User , formpassword: str, session: AsyncSession) -> User:
+        newpassword = generate_passwd_hash(formpassword)
+        user.password = newpassword
+        session.add(user)
+        await session.commit()
+        return user
+
+    async def delete_user(self, id: uuid.UUID, session: AsyncSession):
+        statement = select(User).where(User.uid == id)
+        result = await session.exec(statement)
+        user = result.first()
+        await session.delete(user)
+        await session.commit()

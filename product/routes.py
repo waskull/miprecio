@@ -12,15 +12,15 @@ from ..errors import InvalidUUID, ProductAlreadyExists, ProductNotFound
 
 from ..user.service import UserService
 from .service import ProductService
-from .schemas import ProductCreateModel, ProductModel, ProductEditModel
+from .schemas import ProductCreateModel, ProductModel, ProductEditModel, ProductModelWithCategory
 from ..db import get_session
 
 user_service = UserService()
 product_service = ProductService()
 product_router = APIRouter()
-role_checker = RoleChecker(["admin", "user"])
+role_checker = RoleChecker(["admin", "socio"])
 
-@product_router.get("/", status_code=status.HTTP_200_OK, response_model=List[ProductModel])
+@product_router.get("/", status_code=status.HTTP_200_OK, response_model=list[ProductModelWithCategory])
 async def get_all_users(session: AsyncSession = Depends(get_session)):
     product = await product_service.get_all_products(session)
     return product
@@ -61,6 +61,7 @@ async def create_product(
 async def update_product(
     id:str, 
     product_data: ProductEditModel, 
+    _: bool = Depends(role_checker),
     session: AsyncSession = Depends(get_session)):
 
     if not is_valid_uuid(id):
@@ -72,7 +73,7 @@ async def update_product(
     return {"message": "Producto editado"}
 
 @product_router.delete("/{id}", status_code=status.HTTP_200_OK, )
-async def delete_product(id:str, session: AsyncSession = Depends(get_session)):
+async def delete_product(id:str,_: bool = Depends(role_checker), session: AsyncSession = Depends(get_session)):
     if not is_valid_uuid(id):
         raise InvalidUUID()
     product = await product_service.get_product_by_id(id=uuid.UUID(id, version=4), session=session)

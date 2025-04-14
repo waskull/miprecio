@@ -5,9 +5,11 @@ from sqlalchemy.orm import RelationshipProperty
 from sqlmodel import TEXT, Column, Field, Relationship, SQLModel
 
 from ..user.schemas import Role
+from ..category.model import Category
 
 if TYPE_CHECKING:
     from ..product.model import Product
+    from ..category.model import Category
 
 class User(SQLModel, table=True):
     __tablename__ = "users"
@@ -16,9 +18,7 @@ class User(SQLModel, table=True):
     fullname: str
     role: str = Field(Role.user, nullable=False)
     is_verified: bool = Field(default=False)
-    password: str = Field(
-        sa_column=Column(TEXT, nullable=False), exclude=True
-    )
+    password: str = Field(TEXT, nullable=False, exclude=True)
     created_at: datetime = Field(nullable=True)
     update_at: datetime = Field(nullable=True)
     products: List["Product"] = Relationship(

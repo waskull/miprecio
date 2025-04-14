@@ -43,6 +43,13 @@ class UserAlreadyExists(MyPrice):
 
     pass
 
+class UserPasswordNotMatch(MyPrice):
+    """La nueva clave y la confirmacion de la clave no coinciden."""
+    pass
+
+class UserPasswordMatch(MyPrice):
+    """La nueva clave y la vieja clave son iguales."""
+    pass
 
 class InvalidCredentials(MyPrice):
     """El usuario ha proporcionado credenciales invalidas."""
@@ -67,14 +74,14 @@ class ProductAlreadyExists(MyPrice):
     pass
 
 
-class TagNotFound(MyPrice):
-    """Etiqueta no encontrada"""
+class CategoryNotFound(MyPrice):
+    """Categoria no encontrada"""
 
     pass
 
 
-class TagAlreadyExists(MyPrice):
-    """Etique ya existente"""
+class CategoryAlreadyExists(MyPrice):
+    """Categoria ya existente"""
 
     pass
 
@@ -122,6 +129,29 @@ def register_all_errors(app: FastAPI):
             },
         ),
     )
+
+    app.add_exception_handler(
+        UserPasswordNotMatch,
+        create_exception_handler(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            initial_detail={
+                "message": "La nueva clave y la clave de confirmacion no coinciden",
+                "error_code": "password_not_match",
+            },
+        ),
+    )
+
+    app.add_exception_handler(
+        UserPasswordMatch,
+        create_exception_handler(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            initial_detail={
+                "message": "La nueva clave y la vieja clave son iguales",
+                "error_code": "password_match",
+            },
+        ),
+    )
+
     app.add_exception_handler(
         ProductNotFound,
         create_exception_handler(
@@ -197,20 +227,20 @@ def register_all_errors(app: FastAPI):
         ),
     )
     app.add_exception_handler(
-        TagNotFound,
+        CategoryNotFound,
         create_exception_handler(
             status_code=status.HTTP_404_NOT_FOUND,
-            initial_detail={"message": "Etiqueta no encontrada", "error_code": "tag_not_found"},
+            initial_detail={"message": "Categoria no encontrada", "error_code": "tag_not_found"},
         ),
     )
 
     app.add_exception_handler(
-        TagAlreadyExists,
+        CategoryAlreadyExists,
         create_exception_handler(
             status_code=status.HTTP_403_FORBIDDEN,
             initial_detail={
-                "message": "Etique ya existente",
-                "error_code": "tag_exists",
+                "message": "Nombre de categoria ya existente",
+                "error_code": "category_exists",
             },
         ),
     )
