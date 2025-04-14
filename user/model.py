@@ -5,11 +5,11 @@ from sqlalchemy.orm import RelationshipProperty
 from sqlmodel import TEXT, Column, Field, Relationship, SQLModel
 
 from ..user.schemas import Role
-from ..category.model import Category
 
 if TYPE_CHECKING:
     from ..product.model import Product
     from ..category.model import Category
+    from ..company.model import Company
 
 class User(SQLModel, table=True):
     __tablename__ = "users"
@@ -21,17 +21,24 @@ class User(SQLModel, table=True):
     password: str = Field(TEXT, nullable=False, exclude=True)
     created_at: datetime = Field(nullable=True)
     update_at: datetime = Field(nullable=True)
-    products: List["Product"] = Relationship(
+    products: list["Product"] = Relationship(
         back_populates="createdBy",
         #sa_relationship={RelationshipProperty("Product", primaryjoin="Product.createdBy == User.uid", uselist=True)},
         sa_relationship_kwargs={"lazy": "selectin"},
         cascade_delete=True
     )
     
-    """
-    reviews: List["Review"] = Relationship(
-        back_populates="user", sa_relationship_kwargs={"lazy": "selectin"}
-    ) """
+    user_registered_companies: list["Company"] = Relationship(
+        back_populates="user",
+        sa_relationship_kwargs={"lazy": "selectin", "foreign_keys": "[Company.user_uid]"},
+        cascade_delete=True
+    )
+    companies: list["Company"] = Relationship(
+        back_populates="partner",
+        #sa_relationship={RelationshipProperty("Product", primaryjoin="Product.createdBy == User.uid", uselist=True)},
+        sa_relationship_kwargs={"lazy": "selectin", "foreign_keys": "[Company.partner_uid]"},
+        cascade_delete=True
+    )
 
     def __repr__(self):
         return f"<Usuario: {self.fullname}>"

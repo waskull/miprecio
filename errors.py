@@ -85,6 +85,16 @@ class CategoryAlreadyExists(MyPrice):
 
     pass
 
+class CompanyNotFound(MyPrice):
+    """Compañia no encontrada"""
+
+    pass
+
+class CompanyAlreadyExists(MyPrice):
+    """Compañia ya existente"""
+
+    pass
+
 
 class UserNotFound(MyPrice):
     """Usuario no encontrado"""
@@ -230,7 +240,7 @@ def register_all_errors(app: FastAPI):
         CategoryNotFound,
         create_exception_handler(
             status_code=status.HTTP_404_NOT_FOUND,
-            initial_detail={"message": "Categoria no encontrada", "error_code": "tag_not_found"},
+            initial_detail={"message": "Categoria no encontrada", "error_code": "category_not_found"},
         ),
     )
 
@@ -241,6 +251,25 @@ def register_all_errors(app: FastAPI):
             initial_detail={
                 "message": "Nombre de categoria ya existente",
                 "error_code": "category_exists",
+            },
+        ),
+    )
+
+    app.add_exception_handler(
+        CompanyNotFound,
+        create_exception_handler(
+            status_code=status.HTTP_404_NOT_FOUND,
+            initial_detail={"message": "Compañia no encontrada", "error_code": "company_not_found"},
+        ),
+    )
+
+    app.add_exception_handler(
+        CompanyAlreadyExists,
+        create_exception_handler(
+            status_code=status.HTTP_403_FORBIDDEN,
+            initial_detail={
+                "message": "Nombre de compañia ya existente",
+                "error_code": "company_exists",
             },
         ),
     )

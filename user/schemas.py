@@ -45,3 +45,4 @@ class UserCreateModel(BaseModel):
 class Role (Enum):
     user = "user"
     admin = "admin"
+    partner = "socio"

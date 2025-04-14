@@ -1,22 +1,27 @@
 from typing import List
 import uuid
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, BackgroundTasks, Depends, status
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
+
+from ..config import Config
+
+from ..auth.utils import create_url_safe_token
 
 from ..auth.dependencies import RoleChecker
 
 from ..utils.uuid_validator import is_valid_uuid
 
-from ..errors import InsufficientPermission, InvalidUUID, UserNotFound, UserPasswordNotMatch
+from ..errors import InsufficientPermission, InvalidUUID, UserAlreadyExists, UserNotFound, UserPasswordNotMatch
 
 from .service import UserService
-from .schemas import Role, UserEditModel, UserModel, UserPasswordEditModel
+from .schemas import Role, UserCreateModel, UserEditModel, UserModel, UserPasswordEditModel
 from ..db import get_session
 
 user_service = UserService()
 user_router = APIRouter()
 role_checker = RoleChecker(["admin", "socio", "user"])
+admin_checker = RoleChecker(["admin"])
 
 @user_router.get("/", status_code=status.HTTP_200_OK, response_model=List[UserModel])
 async def get_all_users(session: AsyncSession = Depends(get_session)):
@@ -79,3 +84,41 @@ async def delete_product(id:str,_: bool = Depends(role_checker), session: AsyncS
         raise InsufficientPermission()
     await user_service.delete_user(id, session)
     return {"message": "Usuario borrado"}
+
+@user_router.post("/", status_code=status.HTTP_201_CREATED)
+async def create_partner_account(
+    user_data: UserCreateModel,
+    bg_tasks: BackgroundTasks,
+    _: bool = Depends(admin_checker),
+    session: AsyncSession = Depends(get_session),
+):
+    """
+    Crea una cuenta de socio utilizando un correo un usuario, un nombre y un apellido
+    params:
+        user_data: UserCreateModel
+    """
+    email = user_data.email
+    user_exists = await user_service.user_exists(email, session)
+
+    if user_exists:
+        raise UserAlreadyExists()
+    new_user = await user_service.create_user(user_data, session, is_partner=True)
+
+    token = create_url_safe_token({"email": email})
+
+    link = f"http://{Config.DOMAIN}/api/v1/auth/verify/{token}"
+
+    html = f"""
+    <h1>Verify your Email</h1>
+    <p>Por favor haz click aqui <a href="{link}">link</a> para verificar tu correo.</p>
+    """
+
+    emails = [email]
+
+    subject = "Verifica tu correo"
+
+    #send_email.delay(emails, subject, html)
+
+    return {
+        "message": "Cuenta creada, verifica tu correo para activar tu cuenta"
+    }

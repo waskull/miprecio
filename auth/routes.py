@@ -68,7 +68,7 @@ async def create_user_Account(
     session: AsyncSession = Depends(get_session),
 ):
     """
-    Crea una cuenta de usuario utilizando un correom un usuario, un nombre y un apellido
+    Crea una cuenta de usuario utilizando un correo un usuario, un nombre y un apellido
     params:
         user_data: UserCreateModel
     """
