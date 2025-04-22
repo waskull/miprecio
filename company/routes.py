@@ -42,11 +42,16 @@ async def get_company_by_name(name:str, session: AsyncSession = Depends(get_sess
     return company
 
 @company_router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_company(company: CompanyModel, session: AsyncSession = Depends(get_session), _: bool = Depends(role_checker),):
-    category_exists = await company_service.get_company_by_name(name=company.name, session=session)
-    if category_exists is not None:
+async def create_company(
+    company: CompanyCreateModel, 
+    session: AsyncSession = Depends(get_session),
+    user_data=Depends(get_current_user),
+    _: bool = Depends(role_checker),
+    ):
+    company_exists = await company_service.get_company_by_name(name=company.name, session=session)
+    if company_exists is not None:
         raise CompanyAlreadyExists()
-    new_category = await company_service.create_company(company=company, session=session)
+    new_company = await company_service.create_company(company=company, user_data_id=user_data.uid, session=session)
     return {"message": "Compañia creada"}
 @company_router.patch("/{id}", status_code=status.HTTP_200_OK)
 async def update_company(id:str, company_data: CompanyModel,_: bool = Depends(role_checker), session: AsyncSession = Depends(get_session), role_checker: bool = Depends(role_checker),):
@@ -55,8 +60,8 @@ async def update_company(id:str, company_data: CompanyModel,_: bool = Depends(ro
     company = await company_service.get_category_by_id(id=uuid.UUID(id, version=4), session=session)
     if company is None:
         raise CompanyNotFound()
-    category_exists = await company_service.get_category_by_name(name=company_data.name, session=session)
-    if category_exists is not None and category_exists.uid != company.uid:
+    company_exists = await company_service.get_category_by_name(name=company_data.name, session=session)
+    if company_exists is not None and company_exists.uid != company.uid:
         raise CompanyAlreadyExists()
     edited_category = await company_service.edit_company(company=company, company_data=company_data, session=session)
     return {"message": "Compañia editada"}

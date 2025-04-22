@@ -7,6 +7,7 @@ from .user.routes import user_router
 from .product.routes import product_router
 from .category.routes import category_router
 from .company.routes import company_router
+from .store.routes import store_router
 from .db import engine
 
 version = "v1"
@@ -51,3 +52,4 @@ app.include_router(user_router, prefix=f"{version_prefix}/user", tags=["user"])
 app.include_router(product_router, prefix=f"{version_prefix}/product", tags=["product"])
 app.include_router(category_router, prefix=f"{version_prefix}/category", tags=["category"])
 app.include_router(company_router, prefix=f"{version_prefix}/company", tags=["company"])
+app.include_router(store_router, prefix=f"{version_prefix}/store", tags=["store"])

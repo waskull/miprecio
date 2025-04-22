@@ -20,14 +20,16 @@ class CompanyService:
         company = result.first()
         return company
     
-    async def create_company(self, company: CompanyCreateModel, session: AsyncSession) -> Company:
-        company.name = company.name.capitalize()
-        if company.description is not None:
-            company.description = company.description.capitalize()
-        company.uid = uuid.uuid4()
-        await session.add(company)
+    async def create_company(self, company: Company, user_data_id: uuid.UUID, session: AsyncSession) -> Company:
+        company_data_dict = company.model_dump()
+        newcompany = Company(**company_data_dict)
+        newcompany.name = newcompany.name.capitalize()
+        if newcompany.description is not None:
+            newcompany.description = newcompany.description.capitalize()
+        newcompany.uid = uuid.uuid4()
+        newcompany.user_uid = user_data_id
+        session.add(newcompany)
         await session.commit()
-        await session.refresh(company)
         return company
     
     async def delete_company(self, id: uuid.UUID, session: AsyncSession) -> None:

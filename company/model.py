@@ -4,6 +4,7 @@ import uuid
 from sqlmodel import TEXT, Boolean, Field, Relationship, SQLModel
 if TYPE_CHECKING:
     from ..user.model import User
+    from ..store.model import Store
 
 class Company(SQLModel, table=True):
     __tablename__ = "companies"
@@ -23,6 +24,12 @@ class Company(SQLModel, table=True):
     partner: "User"  = Relationship(
         back_populates="companies", 
         sa_relationship_kwargs={"lazy": "selectin", "foreign_keys": "Company.partner_uid"})
+    store: list["Store"] = Relationship(
+        back_populates="company",
+        #sa_relationship={RelationshipProperty("Product", primaryjoin="Product.createdBy == User.uid", uselist=True)},
+        sa_relationship_kwargs={"lazy": "selectin", "uselist": True},
+        cascade_delete=True
+    )
 
     def __repr__(self):
         return f"<Compañia {self.name}>"

@@ -22,13 +22,16 @@ class CategoryService:
         return category
     
     async def create_category(self, category: Category, session: AsyncSession) -> Category:
-        category.name = category.name.capitalize()
-        if category.description is not None:
-            category.description = category.description.capitalize()
-        await session.add(category)
+        category_data_dict = category.model_dump()
+        newcategory = Category(**category_data_dict)
+        newcategory.name = newcategory.name.capitalize()
+        newcategory.uid = uuid.uuid4()
+        if newcategory.description is not None:
+            newcategory.description = newcategory.description.capitalize()
+        session.add(newcategory)
         await session.commit()
-        await session.refresh(category)
-        return category
+        await session.refresh(newcategory)
+        return newcategory
     
     async def delete_category(self, id: uuid.UUID, session: AsyncSession) -> None:
         statement = select(Category).where(Category.uid == id)

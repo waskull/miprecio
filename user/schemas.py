@@ -15,6 +15,11 @@ class UserModel(BaseModel):
     created_at: Optional[datetime]
     update_at: Optional[datetime]
 
+class UserCompanyModel(BaseModel):
+    uid: uuid.UUID
+    email: str
+    fullname: str
+
 class UserModelIdEmail(BaseModel):
     uid: uuid.UUID
     email: str

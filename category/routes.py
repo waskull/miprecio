@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, status
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from .schemas import CateModel, CategoryModel
+from .schemas import CateModel, CategoryCreateModel, CategoryModel
 
 from ..auth.dependencies import RoleChecker, get_current_user
 
@@ -40,7 +40,7 @@ async def get_category_by_name(name:str, session: AsyncSession = Depends(get_ses
     return category
 
 @category_router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_category(category: CategoryModel, session: AsyncSession = Depends(get_session), _: bool = Depends(role_checker),):
+async def create_category(category: CategoryCreateModel, session: AsyncSession = Depends(get_session), _: bool = Depends(role_checker),):
     category_exists = await category_service.get_category_by_name(name=category.name, session=session)
     if category_exists is not None:
         raise CategoryAlreadyExists()

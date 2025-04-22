@@ -95,6 +95,16 @@ class CompanyAlreadyExists(MyPrice):
 
     pass
 
+class StoreNotFound(MyPrice):
+    """Tienda no encontrada"""
+
+    pass
+
+class StoreAlreadyExists(MyPrice):
+    """Tienda ya existente"""
+
+    pass
+
 
 class UserNotFound(MyPrice):
     """Usuario no encontrado"""
@@ -251,6 +261,25 @@ def register_all_errors(app: FastAPI):
             initial_detail={
                 "message": "Nombre de categoria ya existente",
                 "error_code": "category_exists",
+            },
+        ),
+    )
+
+    app.add_exception_handler(
+        StoreNotFound,
+        create_exception_handler(
+            status_code=status.HTTP_404_NOT_FOUND,
+            initial_detail={"message": "Tienda no encontrada", "error_code": "store_not_found"},
+        ),
+    )
+
+    app.add_exception_handler(
+        StoreAlreadyExists,
+        create_exception_handler(
+            status_code=status.HTTP_403_FORBIDDEN,
+            initial_detail={
+                "message": "Tienda ya existente",
+                "error_code": "store_exists",
             },
         ),
     )

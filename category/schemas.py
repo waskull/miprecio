@@ -11,7 +11,9 @@ class CateModel(BaseModel):
     uid: uuid.UUID
     products: list[Product]
 
-class CategoryModel(BaseModel):
+class CategoryCreateModel(BaseModel):
     name: str = Field(max_length=80, min_length=2)
     description: str
+
+class CategoryModel(CategoryCreateModel):
     uid: uuid.UUID

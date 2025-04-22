@@ -9,6 +9,7 @@ from ..user.model import User
 if TYPE_CHECKING:
     from ..user.model import User
     from ..category.model import Category
+    from ..store.model import Store
 
 class Product(SQLModel, table=True):
     __tablename__ = "products"
@@ -30,6 +31,12 @@ class Product(SQLModel, table=True):
     #    back_populates="products",
     #    sa_relationship_kwargs={"lazy": "selectin"},
     #)
+    store: list["Store"] = Relationship(
+        back_populates="product",
+        #sa_relationship={RelationshipProperty("Product", primaryjoin="Product.createdBy == User.uid", uselist=True)},
+        sa_relationship_kwargs={"lazy": "selectin", "uselist": True},
+        cascade_delete=True
+    )
 
     def __repr__(self):
         return f"<Producto {self.name}, precio: {self.price}>"

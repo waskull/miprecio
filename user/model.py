@@ -8,7 +8,7 @@ from ..user.schemas import Role
 
 if TYPE_CHECKING:
     from ..product.model import Product
-    from ..category.model import Category
+    from ..store.model import Store
     from ..company.model import Company
 
 class User(SQLModel, table=True):
@@ -27,7 +27,12 @@ class User(SQLModel, table=True):
         sa_relationship_kwargs={"lazy": "selectin"},
         cascade_delete=True
     )
-    
+    stores: list["Store"] = Relationship(
+        back_populates="createdBy",
+        #sa_relationship={RelationshipProperty("Product", primaryjoin="Product.createdBy == User.uid", uselist=True)},
+        sa_relationship_kwargs={"lazy": "selectin"},
+        cascade_delete=True
+    )
     user_registered_companies: list["Company"] = Relationship(
         back_populates="user",
         sa_relationship_kwargs={"lazy": "selectin", "foreign_keys": "[Company.user_uid]"},
