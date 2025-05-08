@@ -6,7 +6,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from ..user.schemas import Role
 
-from .schemas import StoreModel, StoreCreateModel
+from .schemas import StoreCompanyModel, StoreCreateModel
 from ..company.schemas import CompanyStoreModel
 
 from ..auth.dependencies import RoleChecker, get_current_user
@@ -26,6 +26,12 @@ role_checker = RoleChecker([Role.admin.value, Role.partner.value, Role.user.valu
 async def get_all_stores(session: AsyncSession = Depends(get_session)):
     store = await store_service.get_all_stores(session)
     return store
+
+@store_router.get("/stores", status_code=status.HTTP_200_OK, response_model=list[StoreCompanyModel])
+async def get_all_stores(session: AsyncSession = Depends(get_session)):
+    store = await store_service.get_stores(session)
+    return store
+
 
 @store_router.get("/{id}", status_code=status.HTTP_200_OK, response_model=CompanyStoreModel)
 async def get_store(id:str, session: AsyncSession = Depends(get_session)):

@@ -31,6 +31,7 @@ class ProductBasicModel(BaseModel):
     uid: uuid.UUID
     name: str = Field(max_length=100, min_length=2)
     description: str
+    category: Optional[CategoryModel]
 
 class ProductModelWithCategory(ProductCreateModel):
     user_uid: Optional[uuid.UUID] = Field(exclude=True)

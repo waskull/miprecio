@@ -9,6 +9,12 @@ class StoreService:
         stmt = select(Company).where(Company.is_deleted == False).order_by(Company.name)
         result = await session.exec(stmt)
         return result.all()
+    
+    async def get_stores(self, session: AsyncSession):  
+        stmt = select(Store)
+        result = await session.exec(stmt)
+        return result.all()
+
     async def get_store_by_id(self, id: uuid.UUID, session: AsyncSession) -> Store:
         statement = select(Store).where(Store.uid == id)
         result = await session.exec(statement)

@@ -128,8 +128,8 @@ async def verify_user_account(token: str, session: AsyncSession = Depends(get_se
 
 @auth_router.post("/login", status_code=status.HTTP_200_OK)
 async def login_users(
-    request: Request,
     login_data: UserLoginModel,
+    is_mobile: bool = False,
     session: AsyncSession = Depends(get_session),
 ):
     email = login_data.email
@@ -155,16 +155,18 @@ async def login_users(
             )
 
             #print("CLIENT: "+ request.user)
-
-            return JSONResponse(
+            response = JSONResponse(
                 content={
-                    "message": "Inicio de sesión exitoso",
+                    "message": "Inicio de sesión exitoso"+str(is_mobile),
                     "access_token": access_token,
                     "refresh_token": refresh_token,
                     "user": {"email": user.email, "uid": str(user.uid),
                     "role": user.role},
                 }
             )
+            response.set_cookie(key="access_token",secure=False, value=access_token, httponly=True, expires=3600*24*REFRESH_TOKEN_EXPIRY, samesite="lax")
+            response.set_cookie(key="refresh_token",secure=False, value=refresh_token, httponly=True, expires=(3600*24*REFRESH_TOKEN_EXPIRY)*7, samesite="lax")
+            return response
 
     raise InvalidCredentials()
 
