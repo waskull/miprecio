@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 import uuid
 from pydantic import BaseModel
 
@@ -6,6 +6,8 @@ from ..user.schemas import UserCompanyModel
 
 from ..product.schemas import ProductBasicModel
 
+if TYPE_CHECKING:
+    from ..company.schemas import CompanyModel
 
 class StoreCreateModel(BaseModel):
     product_uid: uuid.UUID
@@ -21,5 +23,5 @@ class StoreCompanyModel(BaseModel):
     price: float
     wholesale_price: float
     discount: int
-    createdBy: Optional[UserCompanyModel]
+    createdBy: Optional[UserCompanyModel]   
     product: Optional[ProductBasicModel]
