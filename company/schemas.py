@@ -26,6 +26,7 @@ class CompanyStoreModel(BaseModel):
     uid: uuid.UUID
     name: str
     description:str
+    partner: Optional[UserModel]
     store: list[StoreCompanyModel]
 
 #class CompanyStoreModel(CompanyModel):
