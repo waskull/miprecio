@@ -160,8 +160,12 @@ async def login_users(
                     "message": "Inicio de sesión exitoso"+str(is_mobile),
                     "access_token": access_token,
                     "refresh_token": refresh_token,
-                    "user": {"email": user.email, "uid": str(user.uid),
-                    "role": user.role},
+                    "user": {
+                        "email": user.email, 
+                        "uid": str(user.uid),
+                        "role": user.role,                    
+                        "fullname": user.fullname
+                    },
                 }
             )
             response.set_cookie(key="access_token",secure=False, value=access_token, httponly=True, expires=3600*24*REFRESH_TOKEN_EXPIRY, samesite="lax")
