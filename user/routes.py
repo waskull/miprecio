@@ -90,7 +90,7 @@ async def delete_product(id:str,_: bool = Depends(role_checker), session: AsyncS
         raise UserNotFound()
     if user.role == Role.admin.value:
         raise InsufficientPermission()
-    await user_service.delete_user(id, session)
+    await user_service.delete_user(id=uuid.UUID(id, version=4), session=session)
     return {"message": "Usuario borrado"}
 
 @user_router.post("/", status_code=status.HTTP_201_CREATED)

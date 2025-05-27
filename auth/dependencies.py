@@ -33,11 +33,11 @@ class TokenBearer(HTTPBearer):
         creds = await super().__call__(request)
 
         token = creds.credentials
-        cookie = request.cookies.get("access_token")
+        """ cookie = request.cookies.get("access_token")
 
         if cookie:
             print(cookie)
-        else: print("no hay cookie bv")
+        else: print("no hay cookie bv") """
 
         token_data = decode_token(token)
 

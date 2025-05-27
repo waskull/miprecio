@@ -7,8 +7,8 @@ from sqlmodel.ext.asyncio.session import AsyncSession, Session
 from .config import Config
 
 URL = Config.DATABASE_URL
-engine = create_engine("sqlite:///database2.db", echo=True)
-async_engine = create_async_engine("sqlite+aiosqlite:///database.db", echo=True)
+engine = create_engine("sqlite:///database2.db", echo=False)
+async_engine = create_async_engine("sqlite+aiosqlite:///database.db", echo=False)
 #async_engine = AsyncEngine(create_engine(url=URL))
 
 async def init_db() -> None:

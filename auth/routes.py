@@ -240,7 +240,7 @@ async def reset_account_password(
 
     if new_password != confirm_password:
         raise HTTPException(
-            detail="Passwords do not match", status_code=status.HTTP_400_BAD_REQUEST
+            detail="Las contraseñas no coinciden", status_code=status.HTTP_400_BAD_REQUEST
         )
 
     token_data = decode_url_safe_token(token)
@@ -257,11 +257,11 @@ async def reset_account_password(
         await user_service.update_user(user, {"password_hash": passwd_hash}, session)
 
         return JSONResponse(
-            content={"message": "Password reset Successfully"},
+            content={"message": "Contraseña reiniciada exitosamente"},
             status_code=status.HTTP_200_OK,
         )
 
     return JSONResponse(
-        content={"message": "Error occured during password reset."},
+        content={"message": "Un error ha ocurrido durante el cambio de contraseña."},
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
     )
