@@ -9,6 +9,10 @@ class ProductService:
         stmt = select(Product)
         result = await session.exec(stmt)
         return result.all()
+    async def get_top_products(self, session: AsyncSession) -> list[Product]:
+        stmt = select(Product).limit(5).order_by(Product.update_at.desc())
+        result = await session.exec(stmt)
+        return result.all()
     async def get_product_by_name(self, name: str, session: AsyncSession) -> Product:
         statement = select(Product).where(Product.name == name)
         result = await session.exec(statement)

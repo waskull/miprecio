@@ -12,6 +12,10 @@ class UserService:
         stmt = select(User).options(selectinload(User.products)).where(User.role is not Role.admin.value)
         result = await session.exec(stmt)
         return result.all()
+    async def get_top_users(self, session: AsyncSession) -> list[User]:
+        stmt = select(User).where(User.role != Role.admin.value).limit(5).order_by(User.update_at.desc())
+        result = await session.exec(stmt)
+        return result.all()
     async def get_user_by_email(self, email: str, session: AsyncSession):
         statement = select(User).where(User.email == email)
         result = await session.exec(statement)

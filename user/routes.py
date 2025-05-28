@@ -28,6 +28,11 @@ async def get_all_users(session: AsyncSession = Depends(get_session)):
     users = await user_service.get_all_users(session)
     return users
 
+@user_router.get("/top", status_code=status.HTTP_200_OK, response_model=List[UserModel])
+async def get_all_users(session: AsyncSession = Depends(get_session)):
+    users = await user_service.get_top_users(session)
+    return users
+
 @user_router.get("/{id}", response_model=UserModel, status_code=status.HTTP_200_OK)
 async def get_user(id:str, session: AsyncSession = Depends(get_session)):
     if not is_valid_uuid(id):

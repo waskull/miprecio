@@ -25,6 +25,11 @@ async def get_all_users(session: AsyncSession = Depends(get_session)):
     product = await product_service.get_all_products(session)
     return product
 
+@product_router.get("/top", status_code=status.HTTP_200_OK, response_model=list[ProductModelWithCategory])
+async def get_top_users(session: AsyncSession = Depends(get_session)):
+    product = await product_service.get_top_products(session)
+    return product
+
 @product_router.get("/{id}", response_model=ProductModel, status_code=status.HTTP_200_OK, )
 async def get_product(id:str, session: AsyncSession = Depends(get_session)):
     if not is_valid_uuid(id):
