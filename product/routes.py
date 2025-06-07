@@ -84,5 +84,5 @@ async def delete_product(id:str,_: bool = Depends(role_checker), session: AsyncS
     product = await product_service.get_product_by_id(id=uuid.UUID(id, version=4), session=session)
     if product is None:
         raise ProductNotFound()
-    await product_service.delete_product(id, session)
+    await product_service.delete_product(id=uuid.UUID(id, version=4), session=session)
     return {"message": "Producto borrado"}

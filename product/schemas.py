@@ -8,7 +8,6 @@ from ..category.schemas import CategoryModel
 
 class ProductCreateModel(BaseModel):
     name: str = Field(max_length=100, min_length=2)  
-    price: float = Field(gt=-1)
     description: str
     user_uid: Optional[uuid.UUID] = Field(default=None)
     category_uid: Optional[uuid.UUID] = Field(default=None)

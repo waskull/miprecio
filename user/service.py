@@ -80,10 +80,8 @@ class UserService:
         return user
 
     async def delete_user(self, id: uuid.UUID, session: AsyncSession):
-        print("ID: ", id)
         statement = select(User).where(User.uid == id)
         result = await session.exec(statement)
         user = result.first()
-        print("user: ",user)
         await session.delete(user)
         await session.commit()
