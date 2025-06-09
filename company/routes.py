@@ -48,10 +48,13 @@ async def create_company(
     user_data=Depends(get_current_user),
     _: bool = Depends(role_checker),
     ):
+    print("antes de la query")
     company_exists = await company_service.get_company_by_name(name=company.name, session=session)
     if company_exists is not None:
+        print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
         raise CompanyAlreadyExists()
-    new_company = await company_service.create_company(company=company, user_data_id=user_data.uid, session=session)
+    print("despues de la query", company_exists)
+    new_company = await company_service.create_company(company=company, user_data=user_data, session=session)
     return {"message": "Compañia creada"}
 @company_router.patch("/{id}", status_code=status.HTTP_200_OK)
 async def update_company(id:str, company_data: CompanyModel,_: bool = Depends(role_checker), session: AsyncSession = Depends(get_session), role_checker: bool = Depends(role_checker),):

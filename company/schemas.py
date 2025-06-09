@@ -11,7 +11,7 @@ from ..user.schemas import UserModel
 class CompanyCreateModel(BaseModel):
     name: str = Field(max_length=100, min_length=2) 
     description: str
-    partner_uid: uuid.UUID
+    partner_uid: Optional[uuid.UUID] = None
 
 class CompanyModel(BaseModel):
     uid: uuid.UUID

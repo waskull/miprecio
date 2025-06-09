@@ -20,14 +20,15 @@ class CompanyService:
         company = result.first()
         return company
     
-    async def create_company(self, company: Company, user_data_id: uuid.UUID, session: AsyncSession) -> Company:
+    async def create_company(self, company: Company, user_data: dict, session: AsyncSession) -> Company:
         company_data_dict = company.model_dump()
         newcompany = Company(**company_data_dict)
         newcompany.name = newcompany.name.capitalize()
         if newcompany.description is not None:
             newcompany.description = newcompany.description.capitalize()
         newcompany.uid = uuid.uuid4()
-        newcompany.user_uid = user_data_id
+        newcompany.user_uid = user_data.uid
+        if newcompany.partner_uid is None: newcompany.partner_uid = newcompany.user_uid
         session.add(newcompany)
         await session.commit()
         return company
