@@ -62,7 +62,7 @@ async def create_store(
     if store_exists is not None:
         raise StoreAlreadyExists()
     new_store = await store_service.create_store(store=store, user_data_id=user_data.uid, session=session)
-    return {"message": "Tienda creada"}
+    return {"message": str(new_store.product.name.capitalize())+" ha sido agregado a " + str(new_store.company.name.capitalize() + " con exito")}
 @store_router.patch("/{id}", status_code=status.HTTP_200_OK)
 async def update_store(id:str, company_data: StoreCreateModel,_: bool = Depends(role_checker), session: AsyncSession = Depends(get_session), role_checker: bool = Depends(role_checker),):
     if not is_valid_uuid(id):

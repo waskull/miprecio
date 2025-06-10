@@ -278,7 +278,7 @@ def register_all_errors(app: FastAPI):
         create_exception_handler(
             status_code=status.HTTP_403_FORBIDDEN,
             initial_detail={
-                "message": "Tienda ya existente",
+                "message": "Uno de los productos elegidos ya ha sido agregado previamente a la tienda",
                 "error_code": "store_exists",
             },
         ),
