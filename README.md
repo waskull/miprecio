@@ -1,4 +1,4 @@
-# Miprecio (WIP)
+# MiPrecio (WIP)
 
 Backend para [MiPrecio](https://github.com/waskull/miprecio-react-router).
 
