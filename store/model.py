@@ -18,6 +18,7 @@ class Store(SQLModel, table=True):
     user_uid: uuid.UUID = Field(default=None, foreign_key="users.uid", exclude=True)
     product_uid: uuid.UUID = Field(default=None, foreign_key="products.uid", exclude=True)
     company_uid: uuid.UUID = Field(default=None, foreign_key="companies.uid", exclude=True)
+    is_deleted: bool = Field(default=False, nullable=True)
     created_at: datetime = Field(nullable=True)
     update_at: datetime = Field(nullable=True)
     product: "Product" = Relationship(

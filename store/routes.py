@@ -6,7 +6,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from ..user.schemas import Role
 
-from .schemas import StoreCompanyModel, StoreCreateModel
+from .schemas import StoreCompanyModel, StoreCreateModel, StoreDeleteModel
 from ..company.schemas import CompanyStoreModel
 
 from ..auth.dependencies import RoleChecker, get_current_user
@@ -43,10 +43,18 @@ async def get_store(id:str, session: AsyncSession = Depends(get_session)):
     return store
 
 @store_router.get("/company/{id}", status_code=status.HTTP_200_OK, response_model=CompanyStoreModel)
-async def get_store(id:str, session: AsyncSession = Depends(get_session)):
+async def get_store_by_company(id:str, session: AsyncSession = Depends(get_session)):
     if not is_valid_uuid(id):
         raise InvalidUUID()
     store = await store_service.get_store_by_company_id(id=uuid.UUID(id, version=4), session=session)
+    if store is None:
+        raise StoreNotFound()
+    return store
+@store_router.get("/company/{id}/product/{product_uid}", status_code=status.HTTP_200_OK, response_model=StoreCompanyModel)
+async def get_store_by_company_store(id:str, product_uid:str, session: AsyncSession = Depends(get_session)):
+    if not is_valid_uuid(id):
+        raise InvalidUUID()
+    store = await store_service.get_store_by_company_product_uid(id=uuid.UUID(id, version=4), product_uid=uuid.UUID(product_uid, version=4), session=session)
     if store is None:
         raise StoreNotFound()
     return store
@@ -59,32 +67,40 @@ async def create_store(
     _: bool = Depends(role_checker),
     ):
     store_exists = await store_service.check_store(company_uid=store.company_uid, product_uid=store.product_uid, session=session)
-    if store_exists is not None:
+   
+    if store_exists.is_deleted is True:
+        await store_service.enable_store(store=store_exists, session=session)
+        return {"message": "El producto ha sido rehabilitado con exito"}
+    elif store_exists is not None:
         raise StoreAlreadyExists()
-    new_store = await store_service.create_store(store=store, user_data_id=user_data.uid, session=session)
-    return {"message": str(new_store.product.name.capitalize())+" ha sido agregado a " + str(new_store.company.name.capitalize() + " con exito")}
+    else:
+        new_store = await store_service.create_store(store=store, user_data_id=user_data.uid, session=session)
+        return {"message": "El producto ha sido creado con exito"}
 @store_router.patch("/{id}", status_code=status.HTTP_200_OK)
 async def update_store(id:str, company_data: StoreCreateModel,_: bool = Depends(role_checker), session: AsyncSession = Depends(get_session), role_checker: bool = Depends(role_checker),):
+    print("ASDASDASDSAD: ", company_data)
     if not is_valid_uuid(id):
         raise InvalidUUID()
-    store = await store_service.get_store_by_id(id=uuid.UUID(id, version=4), session=session)
+    store = await store_service.get_store_by_company_product_uid(id=uuid.UUID(id, version=4), product_uid=company_data.product_uid, session=session)
     if store is None:
         raise StoreNotFound()
-    store_exists = store_service.check_store(id=store.uid, product_uid=store.product_uid, session=session)
-    if store_exists is not None and store_exists.uid != store.uid:
-        raise StoreAlreadyExists()
-    edited_store = await store_service.edit_store(store=store, company_data=company_data, session=session)
-    return {"message": "Tienda editada"}
+    #store_exists = store_service.check_store(id=store.uid, product_uid=store.product_uid, session=session)
+    #if store_exists is not None and store_exists.uid != store.uid:
+    #    raise StoreAlreadyExists()
+    edited_store = await store_service.edit_store(store=store, store_data=company_data, session=session)
+    return {"message": "El producto ha sido editado con exito"}
 
 @store_router.delete("/{id}", status_code=status.HTTP_200_OK)
 async def delete_store(
     id:str, 
+    company_data: StoreDeleteModel,
     _: bool = Depends(role_checker),
     session: AsyncSession = Depends(get_session)):    
     if not is_valid_uuid(id):
         raise InvalidUUID()
-    store = await store_service.get_store_by_id(id=uuid.UUID(id, version=4), session=session)
+    print("antes de borrar: ", company_data)
+    store = await store_service.get_store_by_company_product_uid(id=uuid.UUID(id, version=4), product_uid=company_data.product_uid, session=session)
     if store is None:
         raise StoreNotFound()    
-    await store_service.delete_store(id=uuid.UUID(id, version=4), session=session)
-    return {"message": "Tienda borrada"}
+    await store_service.delete_store(store=store, session=session)
+    return {"message": "El producto ha sido borrado de la tienda con exito"}

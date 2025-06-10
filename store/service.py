@@ -25,6 +25,16 @@ class StoreService:
         statement = select(Company).where(Company.uid == id).where(Company.is_deleted == False).order_by(Company.name)
         result = await session.exec(statement)
         store = result.first()
+        store_ = []
+        for i in store.store:
+            if i.is_deleted == False:
+                store_.append(i)
+        store.store = store_
+        return store
+    async def get_store_by_company_product_uid(self, id: uuid.UUID, product_uid: uuid.UUID,  session: AsyncSession) -> Store:
+        statement = select(Store).where(Store.company_uid == id).where(Store.product_uid == product_uid)
+        result = await session.exec(statement)
+        store = result.first()
         return store
     
     async def check_store(self, company_uid: uuid.UUID, product_uid: uuid.UUID, session: AsyncSession) -> Store:
@@ -42,12 +52,18 @@ class StoreService:
         await session.commit()
         return store
     
-    async def delete_store(self, id: uuid.UUID, session: AsyncSession) -> None:
-        statement = select(Store).where(Store.uid == id)
-        result = await session.exec(statement)
-        store = result.first()
-        await session.delete(store)
+    async def delete_store(self, store: Store, session: AsyncSession) -> None:
+        store.is_deleted = True
+        session.add(store)
         await session.commit()
+        await session.refresh(store)
+        return store
+    async def enable_store(self, store: Store, session: AsyncSession) -> None:
+        store.is_deleted = False
+        session.add(store)
+        await session.commit()
+        await session.refresh(store)
+        return store
     
     async def edit_store(self, store: Store, store_data: dict, session: AsyncSession) -> Store:
         store.price = store_data.price
