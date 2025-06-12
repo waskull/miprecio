@@ -1,8 +1,8 @@
 # MiPrecio
 
-## Instrucciones para iniciar
+# Instrucciones para iniciar
 
-# Para ejecutar el programa usa el comando: 
+## Para ejecutar el programa usa el comando: 
 
 ```bash
 fastapi run . --reload
@@ -16,4 +16,4 @@ fastapi run . --reload
 - 🔄 Autenticación usando JWT
 - 📖 SQL
 
-# Para ejecutar el programa usa el comando: fastapi run . --reload
+## Para ejecutar el programa usa el comando: fastapi run . --reload
