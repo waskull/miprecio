@@ -1,7 +1,6 @@
 # MiPrecio
 
-# Instrucciones para iniciar
-
+## Instrucciones para iniciar
 ## Para ejecutar el programa usa el comando: 
 
 ```bash
