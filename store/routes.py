@@ -26,12 +26,15 @@ role_checker = RoleChecker([Role.admin.value, Role.partner.value, Role.user.valu
 async def get_all_stores(session: AsyncSession = Depends(get_session)):
     store = await store_service.get_all_stores(session)
     return store
+@store_router.get("/top", status_code=status.HTTP_200_OK, response_model=list[CompanyStoreModel])
+async def get_all_stores(session: AsyncSession = Depends(get_session)):
+    store = await store_service.get_top_stores(session)
+    return store
 
 @store_router.get("/stores", status_code=status.HTTP_200_OK, response_model=list[StoreCompanyModel])
 async def get_all_stores(session: AsyncSession = Depends(get_session)):
     store = await store_service.get_stores(session)
     return store
-
 
 @store_router.get("/{id}", status_code=status.HTTP_200_OK, response_model=CompanyStoreModel)
 async def get_store(id:str, session: AsyncSession = Depends(get_session)):

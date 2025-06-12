@@ -10,6 +10,11 @@ class StoreService:
         result = await session.exec(stmt)
         return result.all()
     
+    async def get_top_stores(self, session: AsyncSession):  
+        stmt = select(Company).where(Company.is_deleted == False).order_by(Company.name).limit(5)
+        result = await session.exec(stmt)
+        return result.all()
+    
     async def get_stores(self, session: AsyncSession):  
         stmt = select(Store)
         result = await session.exec(stmt)
