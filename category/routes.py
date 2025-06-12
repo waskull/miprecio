@@ -47,7 +47,7 @@ async def create_category(category: CategoryCreateModel, session: AsyncSession =
     new_category = await category_service.create_category(category=category, session=session)
     return {"message": "Categoria creada"}
 @category_router.patch("/{id}", status_code=status.HTTP_200_OK)
-async def update_category(id:str, category_data: CateModel,_: bool = Depends(role_checker), session: AsyncSession = Depends(get_session), role_checker: bool = Depends(role_checker),):
+async def update_category(id:str, category_data: CategoryCreateModel,_: bool = Depends(role_checker), session: AsyncSession = Depends(get_session), role_checker: bool = Depends(role_checker),):
     if not is_valid_uuid(id):
         raise InvalidUUID()
     category = await category_service.get_category_by_id(id=uuid.UUID(id, version=4), session=session)

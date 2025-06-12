@@ -2,11 +2,16 @@ import uuid
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+#from .schemas import ProductFilterModel
 from .model import Product
 
 class ProductService:
     async def get_all_products(self, session: AsyncSession) -> list[Product]:
         stmt = select(Product)
+        result = await session.exec(stmt)
+        return result.all()
+    async def get_all_filtered_products(self, uids: list[uuid.UUID], session: AsyncSession) -> list[Product]:
+        stmt = select(Product).where(Product.uid.not_in(uids)).order_by(Product.name)
         result = await session.exec(stmt)
         return result.all()
     async def get_top_products(self, session: AsyncSession) -> list[Product]:
@@ -47,8 +52,8 @@ class ProductService:
     
     async def edit_product(self, product: Product, product_data: Product, session: AsyncSession) -> Product:
         product.name = product_data.name
-        product.price = product_data.price
         product.description =product_data.description
+        product.category_uid = product_data.category_uid
         session.add(product)
         await session.commit()
         return product

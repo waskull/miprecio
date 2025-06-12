@@ -12,15 +12,20 @@ class ProductCreateModel(BaseModel):
     user_uid: Optional[uuid.UUID] = Field(default=None)
     category_uid: Optional[uuid.UUID] = Field(default=None)
 
+class ProductFilterModel(BaseModel):
+    uids: list[uuid.UUID]
+
 class ProductUModel(ProductCreateModel):
     uid: uuid.UUID
 
 class ProductEditPriceModel(BaseModel):
     price: float = Field(gt=-1)
 
-class ProductEditModel(ProductEditPriceModel):
+class ProductEditModel(BaseModel):
     name: str = Field(max_length=100, min_length=2) 
     description: str
+    category_uid: Optional[uuid.UUID] = Field(default=None)
+    
 
 class ProductModel(ProductCreateModel):
     createdBy: Optional[UserModel]

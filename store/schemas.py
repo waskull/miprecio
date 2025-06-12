@@ -27,5 +27,6 @@ class StoreCompanyModel(BaseModel):
     price: float
     wholesale_price: float
     discount: int
+    is_deleted: bool = None
     createdBy: Optional[UserCompanyModel]   
     product: Optional[ProductBasicModel]

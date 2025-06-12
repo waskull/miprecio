@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 import uuid
 from fastapi import APIRouter, Depends, status
 from sqlmodel import select
@@ -10,25 +10,36 @@ from ..utils.uuid_validator import is_valid_uuid
 
 from ..errors import InvalidUUID, ProductAlreadyExists, ProductNotFound
 
+from..company.service import CompanyService
 from ..user.service import UserService
 from .service import ProductService
-from .schemas import ProductCreateModel, ProductModel, ProductEditModel, ProductModelWithCategory
+from .schemas import ProductCreateModel, ProductModel, ProductEditModel, ProductModelWithCategory, ProductFilterModel
 from ..db import get_session
 
 user_service = UserService()
 product_service = ProductService()
+company_service = CompanyService()
 product_router = APIRouter()
 role_checker = RoleChecker(["admin", "socio"])
 
 @product_router.get("/", status_code=status.HTTP_200_OK, response_model=list[ProductModelWithCategory])
-async def get_all_users(session: AsyncSession = Depends(get_session)):
+async def get_all_products(session: AsyncSession = Depends(get_session)):
     product = await product_service.get_all_products(session)
     return product
 
 @product_router.get("/top", status_code=status.HTTP_200_OK, response_model=list[ProductModelWithCategory])
-async def get_top_users(session: AsyncSession = Depends(get_session)):
+async def get_top_products(session: AsyncSession = Depends(get_session)):
     product = await product_service.get_top_products(session)
     return product
+
+@product_router.post("/all/", status_code=status.HTTP_200_OK)
+async def get_filtered_products(
+    products_uids: ProductFilterModel,
+    session: AsyncSession = Depends(get_session),
+):    
+    products = await product_service.get_all_filtered_products(uids=products_uids.uids, session=session)
+    print(products)
+    return products
 
 @product_router.get("/{id}", response_model=ProductModel, status_code=status.HTTP_200_OK, )
 async def get_product(id:str, session: AsyncSession = Depends(get_session)):

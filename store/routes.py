@@ -66,13 +66,12 @@ async def create_store(
     user_data=Depends(get_current_user),
     _: bool = Depends(role_checker),
     ):
-    store_exists = await store_service.check_store(company_uid=store.company_uid, product_uid=store.product_uid, session=session)
-   
-    if store_exists.is_deleted is True:
-        await store_service.enable_store(store=store_exists, session=session)
-        return {"message": "El producto ha sido rehabilitado con exito"}
-    elif store_exists is not None:
-        raise StoreAlreadyExists()
+    store_exists = await store_service.check_store(company_uid=store.company_uid, product_uid=store.product_uid, session=session)  
+    if store_exists is not None:
+        if store_exists.is_deleted is True:
+            await store_service.enable_store(store=store_exists, session=session)
+            return {"message": "El producto ha sido rehabilitado con exito"}
+        else: raise StoreAlreadyExists()
     else:
         new_store = await store_service.create_store(store=store, user_data_id=user_data.uid, session=session)
         return {"message": "El producto ha sido creado con exito"}

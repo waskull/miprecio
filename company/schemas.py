@@ -8,9 +8,11 @@ from ..store.schemas import StoreCompanyModel
 from ..user.schemas import UserModel
 
 
-class CompanyCreateModel(BaseModel):
+class CompanyEditModel(BaseModel):
     name: str = Field(max_length=100, min_length=2) 
     description: str
+
+class CompanyCreateModel(CompanyEditModel):
     partner_uid: Optional[uuid.UUID] = None
 
 class CompanyModel(BaseModel):

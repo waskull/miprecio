@@ -6,7 +6,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from ..user.schemas import Role
 
-from .schemas import CompanyModel, CompanyCreateModel
+from .schemas import CompanyModel, CompanyCreateModel, CompanyEditModel
 
 from ..auth.dependencies import RoleChecker, get_current_user
 
@@ -57,13 +57,13 @@ async def create_company(
     new_company = await company_service.create_company(company=company, user_data=user_data, session=session)
     return {"message": "Compañia creada"}
 @company_router.patch("/{id}", status_code=status.HTTP_200_OK)
-async def update_company(id:str, company_data: CompanyModel,_: bool = Depends(role_checker), session: AsyncSession = Depends(get_session), role_checker: bool = Depends(role_checker),):
+async def update_company(id:str, company_data: CompanyEditModel,_: bool = Depends(role_checker), session: AsyncSession = Depends(get_session), role_checker: bool = Depends(role_checker),):
     if not is_valid_uuid(id):
         raise InvalidUUID()
-    company = await company_service.get_category_by_id(id=uuid.UUID(id, version=4), session=session)
+    company = await company_service.get_company_by_id(id=uuid.UUID(id, version=4), session=session)
     if company is None:
         raise CompanyNotFound()
-    company_exists = await company_service.get_category_by_name(name=company_data.name, session=session)
+    company_exists = await company_service.get_company_by_name(name=company_data.name, session=session)
     if company_exists is not None and company_exists.uid != company.uid:
         raise CompanyAlreadyExists()
     edited_category = await company_service.edit_company(company=company, company_data=company_data, session=session)
