@@ -8,8 +8,8 @@ from .model import User
 from ..auth.utils import generate_passwd_hash
 
 class UserService:
-    async def get_all_users(self, session: AsyncSession) -> list[User]:
-        stmt = select(User).options(selectinload(User.products)).where(User.role is not Role.admin.value)
+    async def get_all_users(self, offset:int, limit:int, session: AsyncSession) -> list[User]:
+        stmt = select(User).options(selectinload(User.products)).where(User.role is not Role.admin.value).offset(offset).limit(limit)
         result = await session.exec(stmt)
         return result.all()
     async def get_top_users(self, session: AsyncSession) -> list[User]:

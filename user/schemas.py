@@ -15,6 +15,10 @@ class UserModel(BaseModel):
     created_at: Optional[datetime]
     update_at: Optional[datetime]
 
+class UserResponseModel(BaseModel):
+    users: list[UserModel]
+    total: int
+
 class UserCompanyModel(BaseModel):
     uid: uuid.UUID
     email: str

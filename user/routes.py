@@ -1,6 +1,8 @@
 from typing import List
 import uuid
-from fastapi import APIRouter, BackgroundTasks, Depends, status
+from math import ceil
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, status
+from fastapi.responses import JSONResponse
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -15,7 +17,7 @@ from ..utils.uuid_validator import is_valid_uuid
 from ..errors import InsufficientPermission, InvalidUUID, UserAlreadyExists, UserNotFound, UserPasswordNotMatch
 
 from .service import UserService
-from .schemas import Role, UserCreateModel, UserEditModel, UserModel, UserPasswordEditModel
+from .schemas import Role, UserCreateModel, UserEditModel, UserModel, UserPasswordEditModel, UserResponseModel
 from ..db import get_session
 
 user_service = UserService()
@@ -23,10 +25,10 @@ user_router = APIRouter()
 role_checker = RoleChecker(["admin", "socio", "user"])
 admin_checker = RoleChecker(["admin"])
 
-@user_router.get("/", status_code=status.HTTP_200_OK, response_model=List[UserModel])
-async def get_all_users(session: AsyncSession = Depends(get_session)):
-    users = await user_service.get_all_users(session)
-    return users
+@user_router.get("/", status_code=status.HTTP_200_OK, response_model=UserResponseModel)
+async def get_all_users(offset: int = 0, limit: int = Query(default=100, le=100) ,session: AsyncSession = Depends(get_session)):
+    users = await user_service.get_all_users(offset=offset, limit=limit, session=session)
+    return {"users": users, "total": ceil(len(users) / limit)}
 
 @user_router.get("/top", status_code=status.HTTP_200_OK, response_model=List[UserModel])
 async def get_all_users(session: AsyncSession = Depends(get_session)):
