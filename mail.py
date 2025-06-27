@@ -1,5 +1,5 @@
 from fastapi_mail import FastMail, ConnectionConfig, MessageSchema, MessageType
-from config import Config
+from .config import Config
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -16,17 +16,27 @@ mail_config = ConnectionConfig(
     MAIL_SSL_TLS=False,
     USE_CREDENTIALS=True,
     VALIDATE_CERTS=True,
-    # TEMPLATE_FOLDER=Path(BASE_DIR, "templates"),
+    #TEMPLATE_FOLDER=Path(BASE_DIR, "templates"),
 )
 
 
 mail = FastMail(config=mail_config)
 
 
-def create_message(recipients: list[str], subject: str, body: str):
-
+async def send_email(recipients: list[str], subject: str, body: str):
     message = MessageSchema(
         recipients=recipients, subject=subject, body=body, subtype=MessageType.html
     )
+    fm = FastMail(mail_config)
+    await fm.send_message(message)
 
-    return message
+async def send_email_async(subject: str, email_to: str, body: dict):
+    message = MessageSchema(
+        subject=subject,
+        recipients=[email_to],
+        body=body,
+        subtype='html',
+    )
+    
+    fm = FastMail(mail_config)
+    await fm.send_message(message, template_name='email.html')

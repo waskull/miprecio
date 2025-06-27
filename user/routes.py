@@ -14,7 +14,7 @@ from ..auth.dependencies import RoleChecker, get_current_user
 
 from ..utils.uuid_validator import is_valid_uuid
 
-from ..errors import InsufficientPermission, InvalidUUID, UserAlreadyExists, UserNotFound, UserPasswordNotMatch
+from ..errors import InsufficientPermission, InvalidUUID, UserAlreadyExists, UserNotFound, UserPasswordNotMatch, UserPasswordMatch
 
 from .service import UserService
 from .schemas import Role, UserCreateModel, UserEditModel, UserModel, UserPasswordEditModel, UserResponseModel
@@ -44,6 +44,44 @@ async def get_user(id:str, session: AsyncSession = Depends(get_session)):
         raise UserNotFound()
     return user
 
+@user_router.patch("/password", status_code=status.HTTP_200_OK, )
+async def update_password(
+    user_data: UserPasswordEditModel, 
+    _: bool = Depends(role_checker),
+    current_user = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session)):
+    id = current_user.uid
+    if user_data.newpassword != user_data.confirm_newpassword:
+        raise UserPasswordNotMatch()
+    
+    if user_data.old_password == user_data.newpassword:
+        raise UserPasswordMatch()
+
+    user = await user_service.get_user_by_id(id=id, session=session)
+    if user is None:
+        raise UserNotFound()
+    if user.uid is not current_user.uid and current_user.role is not Role.admin.value:
+        raise InsufficientPermission()
+    edited_user_password = await user_service.edit_user_password(user=user, formpassword=user_data.newpassword, session=session)
+    return {"message": "Contraseña editada"}
+
+@user_router.patch("/profile", status_code=status.HTTP_200_OK)
+async def update_user(
+    user_data: UserEditModel, 
+    current_user = Depends(get_current_user),
+    role: bool = Depends(role_checker),
+    session: AsyncSession = Depends(get_session)):
+    id = current_user.uid
+    user = await user_service.get_user_by_id(id=id, session=session)
+    if user is None:
+        raise UserNotFound()
+    
+    if user.uid is not current_user.uid and current_user.role is not Role.admin.value:
+        raise InsufficientPermission()
+
+    edited_user = await user_service.edit_user(user=user, user_data=user_data, session=session)
+    return {"message": "Usuario editado"}
+
 @user_router.patch("/{id}", status_code=status.HTTP_200_OK)
 async def update_user(
     id:str, 
@@ -63,30 +101,6 @@ async def update_user(
 
     edited_user = await user_service.edit_user(user=user, user_data=user_data, session=session)
     return {"message": "Usuario editado"}
-
-@user_router.patch("/password/{id}", status_code=status.HTTP_200_OK, )
-async def update_password(
-    id:str, 
-    user_data: UserPasswordEditModel, 
-    _: bool = Depends(role_checker),
-    current_user = Depends(get_current_user),
-    session: AsyncSession = Depends(get_session)):
-
-    if user_data.newpassword != user_data.confirm_password:
-        raise UserPasswordNotMatch()
-    
-    if user_data.old_password == user_data.newpassword:
-        raise UserPasswordNotMatch()
-
-    if not is_valid_uuid(id):
-        raise InvalidUUID()
-    user = await user_service.get_user_by_id(id=uuid.UUID(id, version=4), session=session)
-    if user is None:
-        raise UserNotFound()
-    if user.uid is not current_user.uid and current_user.role is not Role.admin.value:
-        raise InsufficientPermission()
-    edited_user_password = await user_service.edit_user_password(user=user, formpassword=user_data.newpassword, session=session)
-    return {"message": "Contraseña editada"}
 
 @user_router.delete("/{id}", status_code=status.HTTP_200_OK)
 async def delete_product(id:str,_: bool = Depends(role_checker), session: AsyncSession = Depends(get_session)):

@@ -155,7 +155,7 @@ def register_all_errors(app: FastAPI):
         create_exception_handler(
             status_code=status.HTTP_400_BAD_REQUEST,
             initial_detail={
-                "message": "La nueva clave y la clave de confirmacion no coinciden",
+                "message": "La nueva contraseña y la contraseña de confirmacion no coinciden",
                 "error_code": "password_not_match",
             },
         ),
@@ -166,7 +166,7 @@ def register_all_errors(app: FastAPI):
         create_exception_handler(
             status_code=status.HTTP_400_BAD_REQUEST,
             initial_detail={
-                "message": "La nueva clave y la vieja clave son iguales",
+                "message": "La nueva contraseña y la vieja contraseña son iguales",
                 "error_code": "password_match",
             },
         ),

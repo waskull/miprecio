@@ -5,6 +5,8 @@ from fastapi.exceptions import HTTPException
 from fastapi.responses import JSONResponse
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from ..mail import send_email_async, send_email
+
 from ..product.schemas import UserProductsModel
 from ..user.schemas import UserCreateModel
 
@@ -207,8 +209,13 @@ async def revoke_token(token_details: dict = Depends(AccessTokenBearer()), sessi
 
 
 @auth_router.post("/password-reset-request")
-async def password_reset_request(email_data: PasswordResetRequestModel):
+async def password_reset_request(email_data: PasswordResetRequestModel, session: AsyncSession = Depends(get_session)):
     email = email_data.email
+
+    user = await user_service.get_user_by_email(email, session)
+
+    if not user:
+        raise UserNotFound()
 
     token = create_url_safe_token({"email": email})
 
@@ -220,7 +227,9 @@ async def password_reset_request(email_data: PasswordResetRequestModel):
     """
     subject = "Reinicio de contraseña"
 
-    #send_email.delay([email], subject, html_message)
+    await send_email([email], subject, html_message)
+    """ await send_email_async('MiPrecio',user.email,
+    {'token': token, 'fullname': user.fullname}) """
     return JSONResponse(
         content={
             "message": "Por favor sigue las instrucciones del correo para actualizar tu contraseña",
