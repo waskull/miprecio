@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from sqlmodel import SQLModel
+from fastapi.middleware.cors import CORSMiddleware
 from .errors import register_all_errors
 from .middleware import register_middleware
 from .auth.routes import auth_router
@@ -29,7 +30,7 @@ app = FastAPI(
     version=version,
     license_info={"name": "MIT License", "url": "https://opensource.org/license/mit"},
     contact={
-        "name": ";artin C",
+        "name": "Martin C",
         "url": "https://github.com/waskull",
         "email": "mrtncsto@gmail.com",
     },
@@ -37,6 +38,14 @@ app = FastAPI(
     openapi_url=f"{version_prefix}/openapi.json",
     docs_url=f"{version_prefix}/docs",
     redoc_url=f"{version_prefix}/redoc"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 @app.get("/health", tags=["root"], include_in_schema=False, response_model=dict)
