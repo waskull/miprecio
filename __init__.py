@@ -40,14 +40,6 @@ app = FastAPI(
     redoc_url=f"{version_prefix}/redoc"
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 @app.get("/health", tags=["root"], include_in_schema=False, response_model=dict)
 async def read_root():
     return {"message": "Bv"}
